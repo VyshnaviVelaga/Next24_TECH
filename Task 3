@@ -1,0 +1,49 @@
+import tkinter as tk
+from tkinter import messagebox
+import requests
+
+def fetch_lyrics():
+    artist = artist_entry.get().strip()
+    song = song_entry.get().strip()
+    if not artist or not song:
+        messagebox.showerror("Input Error", "Enter both artist and song name:")
+        return
+    
+    url = f"https://api.lyrics.ovh/v1/{artist}/{song}"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        data = response.json()
+        lyrics = data.get("lyrics", "Lyrics not found.")
+        lyrics_text.delete(1.0, tk.END)
+        lyrics_text.insert(tk.END, lyrics)
+    else:
+        messagebox.showerror("API Error", "Could not find lyrics.")
+
+root = tk.Tk()
+root.title("Lyrics Fetcher")
+root.configure(bg="#ffffff")
+
+bg_color = "#ffffff"
+fg_color = "#333333"
+entry_bg = "#add8e6"  # Light blue
+button_bg = "#48c9b0"
+button_fg = "#ffffff"
+text_bg = "#d5f5e3"
+text_fg = "#333333"
+
+tk.Label(root, text="Artist:", bg=bg_color, fg=fg_color, font=("Helvetica", 12)).grid(row=0, column=0, padx=10, pady=10, sticky="e")
+artist_entry = tk.Entry(root, width=30, bg=entry_bg, fg=fg_color, font=("Helvetica", 12))
+artist_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+
+tk.Label(root, text="Song:", bg=bg_color, fg=fg_color, font=("Helvetica", 12)).grid(row=1, column=0, padx=10, pady=10, sticky="e")
+song_entry = tk.Entry(root, width=30, bg=entry_bg, fg=fg_color, font=("Helvetica", 12))
+song_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+fetch_button = tk.Button(root, text="Fetch Lyrics", command=fetch_lyrics, bg=button_bg, fg=button_fg, font=("Helvetica", 12, "bold"), padx=10, pady=5, relief="raised")
+fetch_button.grid(row=2, column=0, columnspan=2, pady=20)
+
+lyrics_text = tk.Text(root, wrap=tk.WORD, width=60, height=20, bg=text_bg, fg=text_fg, font=("Helvetica", 12))
+lyrics_text.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+
+root.mainloop()
